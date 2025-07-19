@@ -23,8 +23,7 @@ const CreateTestSubject = () => {
           end_time: values?.end_time,
           createdBy: 0,
           isDeleted: false,
-          mark: values?.total_question,
-          total_questions: values?.total_question,
+          mark: values?.total_score,
         });
         if (res?.status === 201) {
           message.success(res?.data?.message || "Create successfully!");
@@ -41,6 +40,25 @@ const CreateTestSubject = () => {
     },
     [message]
   );
+
+  const checkForNumber = (e) => {
+    const allowedKeys = [
+      'Backspace', 'ArrowLeft', 'ArrowRight', 'Delete', 'Tab',
+    ];
+
+    if (
+        !/[0-9]/.test(e.key) &&
+        !allowedKeys.includes(e.key)
+    ) {
+      e.preventDefault();
+    }
+  }
+
+  const roundingDownTo = (value, step) => {
+    return Math.floor(value / step) * step;
+  }
+
+  const stepRoundingDown = 0.005;
 
   return (
     <div className={styles.container}>
@@ -60,7 +78,11 @@ const CreateTestSubject = () => {
             { required: true, message: "Please input the test subject code!" },
           ]}
         >
-          <Input className={styles.input} />
+          <InputNumber
+              className={styles.input}
+              controls={false}
+              style={{ width: "100%" }}
+          />
         </Form.Item>
         <Form.Item
           label="Exam Title"
@@ -104,6 +126,9 @@ const CreateTestSubject = () => {
             min={1}
             className={styles.input}
             style={{ width: "100%" }}
+            parser={(value) => value.replace(/\D/g, '')}
+            formatter={(value) => (value ? `${value}`.replace(/\D/g, '') : '')}
+            onKeyDown={checkForNumber}
           />
         </Form.Item>
         <Form.Item
@@ -118,6 +143,34 @@ const CreateTestSubject = () => {
         >
           <InputNumber
             min={1}
+            className={styles.input}
+            style={{ width: "100%" }}
+            parser={(value) => value.replace(/\D/g, '')}
+            formatter={(value) => (value ? `${value}`.replace(/\D/g, '') : '')}
+            onKeyDown={checkForNumber}
+          />
+        </Form.Item>
+        <Form.Item
+          label={"Total Score"}
+          name="total_score"
+          normalize={(value) => {
+            if(typeof value === "number") {
+              const roundedNumber = roundingDownTo(value, stepRoundingDown);
+              console.log(roundedNumber);
+              return Number(roundedNumber.toFixed(3));
+            }
+            return value;
+          }}
+          rules={[
+            {
+              required: true,
+              message: "Please input total score!",
+            }
+          ]}>
+          <InputNumber
+            min={0}
+            precision={3}
+            step={0.005}
             className={styles.input}
             style={{ width: "100%" }}
           />
