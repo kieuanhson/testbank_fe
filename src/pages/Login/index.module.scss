@@ -1,0 +1,63 @@
+/* SCSS module for Login page (renamed from Login.module.scss) */
+.loginBg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 600px;
+  height: 500px;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoWrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.logoImg {
+  width: 200px;
+  height: 200px;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #1d4ed8;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  margin-bottom: 0.5rem;
+  color: #6b7280;
+  text-align: center;
+  font-size: 0.75rem;
+}
+
+.formWrap {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 0.5rem;
+}
+
+.loginBtn {
+  margin-top: 0.5rem;
+}
