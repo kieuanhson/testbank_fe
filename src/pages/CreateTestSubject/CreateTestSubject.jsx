@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from "react";
-import { Form, Input, InputNumber, Button, Typography, DatePicker } from "antd";
+import React, {useCallback, useEffect, useState} from "react";
+import {Form, Input, InputNumber, Button, Typography, DatePicker, Select} from "antd";
 import styles from "./CreateTestSubject.module.scss";
 import { useGlobalMessage } from "../../context/message";
 import apiTestBankWithToken from "../../service/apiTestBankWithToken";
@@ -9,11 +9,17 @@ const CreateTestSubject = () => {
   const [form] = Form.useForm();
   const message = useGlobalMessage();
   const [loading, setLoading] = useState(false);
+  const [subject, setSubject] = useState([]);
 
   const onFinish = useCallback(
     async (values) => {
       setLoading(true);
       try {
+        const selectedSubject = subject.find((subject) => subject.value === values?.subject_id);
+        if (selectedSubject.questions_count < values.total_question) {
+          message.error("There are not enough questions to create exam for subject " + selectedSubject.label + ".");
+          return;
+        }
         const res = await apiTestBankWithToken.post(APIS_TEST_BANK.createExam, {
           subject_id: values?.subject_id,
           title: values?.title,
@@ -38,7 +44,7 @@ const CreateTestSubject = () => {
         setLoading(false);
       }
     },
-    [message]
+    [message, subject]
   );
 
   const checkForNumber = (e) => {
@@ -54,11 +60,33 @@ const CreateTestSubject = () => {
     }
   }
 
+  const stepRoundingDown = 0.005;
   const roundingDownTo = (value, step) => {
     return Math.floor(value / step) * step;
   }
 
-  const stepRoundingDown = 0.005;
+  const onSubjectChange = (value) => {
+    form.setFieldsValue({subject_id: value});
+  }
+
+  useEffect(() => {
+        apiTestBankWithToken
+            .get(APIS_TEST_BANK.getSubject)
+            .then((res) => {
+              const data = res.data;
+              console.log(data);
+              const subjects = data.data.subjects.map((item) => {
+                return {value: item.id, label: item.name, questions_count: item.questions_count};
+              })
+              console.log(subjects)
+              setSubject(subjects);
+            })
+            .catch((err) => {
+              message.error("Cannot load subject lists.");
+              console.log(err);
+            })
+      }
+  , []);
 
   return (
     <div className={styles.container}>
@@ -78,10 +106,10 @@ const CreateTestSubject = () => {
             { required: true, message: "Please input the test subject code!" },
           ]}
         >
-          <InputNumber
-              className={styles.input}
-              controls={false}
-              style={{ width: "100%" }}
+          <Select
+            style={{ width: "100%" }}
+            options={subject}
+            onChange={onSubjectChange}
           />
         </Form.Item>
         <Form.Item
